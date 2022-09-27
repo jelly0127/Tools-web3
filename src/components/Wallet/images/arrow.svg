@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>PCH5上下按钮</title>
+    <g id="切图" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="画板" transform="translate(-399.000000, -465.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="down" transform="translate(415.000000, 481.000000) scale(1, -1) translate(-415.000000, -481.000000) translate(399.000000, 465.000000)">
+                <rect id="矩形" opacity="0" x="0" y="0" width="32" height="32"></rect>
+                <path d="M27.625,8 L25.28125,8 C25.121875,8 24.971875,8.078125 24.878125,8.20625 L16,20.44375 L7.121875,8.20625 C7.028125,8.078125 6.878125,8 6.71875,8 L4.375,8 C4.171875,8 4.053125,8.23125 4.171875,8.396875 L15.190625,23.5875 C15.590625,24.1375 16.409375,24.1375 16.80625,23.5875 L27.825,8.396875 C27.946875,8.23125 27.828125,8 27.625,8 Z" id="路径"></path>
+            </g>
+        </g>
+    </g>
+</svg>
