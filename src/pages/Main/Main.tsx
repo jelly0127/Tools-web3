@@ -28,7 +28,7 @@ export default function Main() {
         <TopBox telegramSrc={''} learnSrc={''} ></TopBox>
         <Content />
       </ContentBox>
-      <Footer />
+      {/* <Footer /> */}
     </MainBox>
   )
 }
