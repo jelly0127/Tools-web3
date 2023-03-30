@@ -1,5 +1,7 @@
 const webpack = require('webpack')
-const { merge } = require('webpack-merge')
+const {
+  merge
+} = require('webpack-merge')
 
 module.exports = {
   webpack: {
@@ -7,7 +9,10 @@ module.exports = {
     configure: config => {
       return merge(config, {
         module: {
-          rules: [
+          rules: [{
+              test: /\.(png|jpe?g|gif|webp)$/,
+              type: "asset",
+            },
             {
               test: /\.js$/,
               enforce: 'pre',

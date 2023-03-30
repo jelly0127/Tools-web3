@@ -2,22 +2,22 @@ import styled from 'styled-components'
 import { defaultTheme, flexCenter } from '../../style'
 
 const WalletWrapper = styled.div`
-  font-weight: 700;
-  font-size: ${props => props.theme.fontNormal};
+  font-size: ${props => props.theme.fontSmall};
   line-height: 24px;
   ${flexCenter};
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  width: 300px;
+  height: 28px;
+  width: 128px;
   padding: 8px;
   border-radius: 2px;
   color: ${defaultTheme.grey1};
-  line-height: 19px;
-  border: 1px solid ${prop => prop.theme.grey1};
+  /* border: 1px solid ${prop => prop.theme.grey1}; */
   cursor: pointer;
-  background-color: ${prop => prop.theme.grey2};
+  background: #EEEEEE;
+
+  /* background-color: ${prop => prop.theme.grey2}; */
   .logo {
     width: 16px;
     height: 16px;
@@ -26,8 +26,8 @@ const WalletWrapper = styled.div`
     ${flexCenter};
     margin-right: 10px;
     img {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
     }
   }

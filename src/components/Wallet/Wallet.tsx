@@ -14,7 +14,7 @@ import { useClipboard } from 'use-clipboard-copy'
 import NetworkSelector from './NetworkSelector'
 import WalletWarningIcon from './images/wallet-select.png'
 import CopyIcon from '../../images/copy-icon.svg'
-import AvatarIcon from '../../images/avatar-icon.png'
+import AvatarIcon from '../../images/wallet-metamask-icon.png'
 import Button from '../Button/Button'
 import { useLoading } from '../Loading/Loading'
 import Drawer from '../Drawer'
@@ -25,7 +25,28 @@ import { Connector } from '@web3-react/types'
 import { coinbaseWallet, getWalletForConnector, injected } from '../../web3/connectors'
 import { showSwitchChain, updateSelectedWallet } from '../../redux/reducer'
 import { useAppDispatch, useAppSelector } from '../../helpers/hooks'
-import MModal from '../../pages/components/Modal'
+import styled from 'styled-components'
+import { flexCenter } from '../../style'
+// import MModal from '../../pages/components/Modal'
+
+const PriceBox = styled.button`
+  width: 100px;
+  height: 26px;
+  border: 1px solid #ccc;
+margin-right: 10px;
+text-align: center;
+line-height: 26px;
+border-radius: 2px;
+color:#5d5b5b;
+font-weight: 500;
+${flexCenter}
+font-size: ${props => props.theme.fontSmall};
+:hover{
+  color:#F95997;
+  background-color: #ffd0d8;
+  border: none;
+}
+`
 
 const Wallet: React.FC = () => {
   const [showDisconnectModal, setShowDisconnectModal] = useState(false)
@@ -216,9 +237,10 @@ const Wallet: React.FC = () => {
   }
   return (
     <>
-      <NetworkSelector
+      {/* <NetworkSelector
         onWalletDisconnect={!isActive && !account ? handleShowDisconnectModal : undefined}
-      />
+      /> */}
+      {/* <PriceBox>价格</PriceBox> */}
       {walletWrapper()}
       <Modal
         title=""
@@ -245,7 +267,7 @@ const Wallet: React.FC = () => {
         </AccountModal>
       </Modal>
       <DisconnectModal />
-      <MModal
+      {/* <Modal
         title="Wrong Network"
         open={switchChainModal}
         width={420}
@@ -270,7 +292,7 @@ const Wallet: React.FC = () => {
             <Button primary onClick={handleConnectNetwork} text="Switch Network" />
           </div>
         </WalletModal>
-      </MModal>
+      </Modal> */}
       {/* <Drawer open={showAccountModal && !isDesktop} onClose={() => setShowAccountModal(false)}>
         <AccountDrawer>
           <div className="content">

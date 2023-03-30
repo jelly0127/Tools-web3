@@ -39,7 +39,7 @@ export default function Web3Provider({ children }: { children: ReactNode }) {
       dispatch(updateProvider({ provider: customProvider }))
     }
     // The dependency list is empty so this is only run once on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) 
 
   return <Web3ReactProvider connectors={connectors}>{children}</Web3ReactProvider>
 }

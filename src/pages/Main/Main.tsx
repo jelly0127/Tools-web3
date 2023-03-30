@@ -1,50 +1,34 @@
-import { useWeb3React } from '@web3-react/core'
-import { Link } from 'react-router-dom'
-import Button from '../../components/Button'
-import message from '../../components/Message'
-import toast from '../../components/Toast/Toast'
-// import { ABI } from '../../web3/abi'
-// import { contractMethod, txPromise, useContract } from '../../web3/functions'
+import React from 'react'
+import styled from 'styled-components'
+import Card from '../components/Card/Card'
+import MetamaskIcon from '../../images/wallet-metamask-icon.png'
+import { flexCenter } from '../../style'
+import TopBox from '../components/TopBox/TopBox'
+import Content from '../components/Content/Content'
+import Footer from '../components/Footer/Footer'
 
-const TEST_NFT = '0x4c3e87Add69CA7FE21D51B2507449de171725048'
+const MainBox = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+`
+const ContentBox = styled.div`
+  height: 100%;
+  padding-bottom: 36px;
+  min-width: 1170px;
+  background-color: #FFFFFF;
 
-// const Box = styled.div`
-//   align-items: center;
-//   justify-content: center;
-//   padding: 0 22px;
-// `
-const Main: React.FC = () => {
-  const { provider } = useWeb3React()
-  // const testNFTContract = useContract(TEST_NFT, ABI, true)
-  // demo
-  // const handleTest = () => {
-  //   contractMethod(testNFTContract!, 'mint', null, true).then(res => {
-  //     res
-  //       .wait()
-  //       .then((txRes: { transactionHash: any }) => {
-  //         const { transactionHash } = txRes
-  //         message({ messagePromose: txPromise(provider!, transactionHash) })
-  //       })
-  //       .catch((err: { message: any }) => toast({ text: err.message, type: 'error' }))
-  //   })
-  // }
-  const testMsg = () => {
-    const pro = new Promise<void>(resolve => {
-      setTimeout(() => {
-        resolve()
-      }, 3000)
-    })
-    message({ messagePromose: pro })
-  }
+`
+export default function Main() {
   return (
-    <>
-      <Link to="/">
-        <Button text="link to test page" />
-      </Link>
-      {/* <Button fullWidth onClick={handleTest} text="test" /> */}
-      <Button fullWidth onClick={() => testMsg()} text="Message" />
-    </>
+    <MainBox>
+      <ContentBox>
+        <TopBox telegramSrc={''} learnSrc={''} ></TopBox>
+        <Content />
+      </ContentBox>
+      <Footer />
+    </MainBox>
   )
 }
-
-export default Main

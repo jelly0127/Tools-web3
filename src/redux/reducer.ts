@@ -17,7 +17,7 @@ interface AppState {
 
 const handleView = (desktopValue: boolean) => {
   // 如果是尺寸的设计稿在这里修改
-  const WIDTH = 1024
+  const WIDTH = 1280
   const IPHONE = 375
   // 设置html标签的fontSize
   document.documentElement.style.fontSize = desktopValue

@@ -59,9 +59,13 @@ const GlobalStyle = createGlobalStyle`
   @font-face {
     font-family: 'IBMPlexSerif';
     src: url(${IBMPlexSerif});
-  } 
+    ::-webkit-scrollbar {
+    display: none;
+}
+  }
+  background-color: #FAFAFA;
     min-height: 100%;
-    min-width: 1024px;
+    min-width: 1280px;
     position: relative;
     overflow: scroll;
     font-size: ${prop => prop.theme.fontNormal};
@@ -78,7 +82,6 @@ const GlobalStyle = createGlobalStyle`
       }
     }
   }
-
   body, textarea, input, button {
     line-height: 1;
   }
@@ -108,7 +111,6 @@ const GlobalStyle = createGlobalStyle`
   }
   ul {
     padding: 0 !important;
-    border: 1px solid #000 !important;
   }
   img {
     display: block;

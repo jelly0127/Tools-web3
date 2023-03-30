@@ -1,14 +1,12 @@
 import React from 'react'
 import { Navigate, RouteObject } from 'react-router-dom'
-
+const Buy =React.lazy(()=>import('./pages/ToolsPage/Buy/Buy'))
+const Collection =React.lazy(()=>import('./pages/ToolsPage/Collection/Collection'))
+const Sell =React.lazy(()=>import('./pages/ToolsPage/Sell/Sell'))
+const CreateWallet =React.lazy(()=>import('./pages/ToolsPage/CreateWallet/CreateWallet'))
+const Transfer =React.lazy(()=>import('./pages/ToolsPage/Transfer/Transfer'))
 const OpenOrder = React.lazy(() => import('./pages/OpenOrder/OpenOrder'))
-const FilledOrder = React.lazy(() => import('./pages/FilledOrder/FilledOrder'))
-const MyOrder = React.lazy(() => import('./pages/MyOrder/MyOrder'))
-const MyPositions = React.lazy(() => import('./pages/MyPositions/MyPositions'))
-const CreateOrder = React.lazy(() => import('./pages/CreateOrder/CreateOrder'))
-const Details = React.lazy(() => import('./pages/Details/Details'))
-const Mint = React.lazy(() => import('./pages/Mint/Mint'))
-
+const Main=React.lazy(() => import('./pages/Main/Main'))
 const lazyFactory = (LazyComponent: React.LazyExoticComponent<React.FC<{}>>) => {
   return (
     <React.Suspense fallback={null}>
@@ -16,22 +14,21 @@ const lazyFactory = (LazyComponent: React.LazyExoticComponent<React.FC<{}>>) => 
     </React.Suspense>
   )
 }
-const LazyOpenOrder = lazyFactory(OpenOrder)
-const LazyFilledOrder = lazyFactory(FilledOrder)
-const LazyMyOrder = lazyFactory(MyOrder)
-const LazyMyPositions = lazyFactory(MyPositions)
-const LazyCreateOrder = lazyFactory(CreateOrder)
-const LazyDetails = lazyFactory(Details)
-const LazyMint = lazyFactory(Mint)
+const LazyMain= lazyFactory(Main)
+const LazyBuy= lazyFactory(Buy)
+const LazyCollection= lazyFactory(Collection)
+const LazySell= lazyFactory(Sell)
+const LazyCreateWallet= lazyFactory(CreateWallet)
+const LazyTransfer= lazyFactory(Transfer)
+
 
 export const routes: RouteObject[] = [
-  { path: '/', element: LazyOpenOrder },
-  { path: '/filledOrder', element: LazyFilledOrder },
-  { path: '/myOrder', element: LazyMyOrder },
-  { path: '/myPositions', element: LazyMyPositions },
-  { path: '/createOrder', element: LazyCreateOrder },
-  { path: '/detail/:status', element: LazyDetails },
-  { path: '/mint', element: LazyMint },
+  { path: '/', element: LazyMain },
+  { path: '/buy', element: LazyBuy },
+  { path: '/sell', element: LazySell },
+  { path: '/collection', element: LazyCollection },
+  { path: '/createWallet', element: LazyCreateWallet },
+  { path: '/transfer', element: LazyTransfer },
   { path: '*', element: <Navigate to="/" /> },
 ]
 export default routes

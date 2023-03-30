@@ -6,17 +6,17 @@ import { Connector } from '@web3-react/types'
 import { coinbaseWallet, injected, network, walletConnect } from './connectors'
 
 export enum ChainId {
-  // MAINNET = 1,
-  // BSC_TEST = 97,
-  // OPTIMISM = 10,
-  MUMBAI = 80001,
+  MAINNET = 1,
+  BSC_TEST = 97,
+  OPTIMISM = 10,
+  // MUMBAI = 80001,
 }
 
 export const CHAIN_IDS_TO_NAMES = {
   // [ChainId.MAINNET]: 'mainnet',
-  // [ChainId.BSC_TEST]: 'BSC_Testnet',
+  [ChainId.BSC_TEST]: 'BSC_Testnet',
   // [ChainId.OPTIMISM]: 'optimism',
-  [ChainId.MUMBAI]: 'Mumbai Testnet',
+  // [ChainId.MUMBAI]: 'Mumbai Testnet',
 }
 /**
  * Array of all the supported chain IDs
@@ -26,7 +26,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: ChainId[] = Object.values(ChainId).filter(
 ) as ChainId[]
 
 // 默认显示的链
-export const DEFAULT_NETWORK = ChainId.MUMBAI
+export const DEFAULT_NETWORK = ChainId.BSC_TEST
 export const NetworkContextName = 'NETWORK'
 
 export const SUPPORTED_CHAIN_IDS = [80001]
@@ -57,23 +57,23 @@ export const NETWORK_CONFIG: NetworkConfig = {
   //     decimals: 18,
   //   },
   // },
-  // [ChainId.BSC_TEST]: {
-  //   chainId: [ChainId.BSC_TEST],
-  //   chainName: 'BSC_Testnet',
-  //   rpcUrls: [
-  //     'https://data-seed-prebsc-2-s3.binance.org:8545',
-  //     'https://data-seed-prebsc-1-s3.binance.org:8545',
-  //     'https://data-seed-prebsc-1-s2.binance.org:8545',
-  //     'https://data-seed-prebsc-2-s1.binance.org:8545',
-  //   ],
-  //   logo: BscIcon,
-  //   explorer: 'https://testnet.bscscan.com/',
-  //   nativeCurrency: {
-  //     name: 'tBNB',
-  //     symbol: 'tBNB',
-  //     decimals: 18,
-  //   },
-  // },
+  [ChainId.BSC_TEST]: {
+    chainId: [ChainId.BSC_TEST],
+    chainName: 'BSC_Testnet',
+    rpcUrls: [
+      'https://data-seed-prebsc-2-s3.binance.org:8545',
+      'https://data-seed-prebsc-1-s3.binance.org:8545',
+      'https://data-seed-prebsc-1-s2.binance.org:8545',
+      'https://data-seed-prebsc-2-s1.binance.org:8545',
+    ],
+    logo: BscIcon,
+    explorer: 'https://testnet.bscscan.com/',
+    nativeCurrency: {
+      name: 'tBNB',
+      symbol: 'tBNB',
+      decimals: 18,
+    },
+  },
   // [ChainId.OPTIMISM]: {
   //   chainId: [ChainId.OPTIMISM],
   //   chainName: 'Optimism',
@@ -86,23 +86,23 @@ export const NETWORK_CONFIG: NetworkConfig = {
   //     decimals: 18,
   //   },
   // },
-  [ChainId.MUMBAI]: {
-    chainId: [ChainId.MUMBAI],
-    chainName: 'Mumbai Testnet',
-    rpcUrls: [
-      'https://matic-testnet-archive-rpc.bwarelabs.com',
-      'https://matic-mumbai.chainstacklabs.com',
-      'https://rpc.ankr.com/polygon_mumbai',
-      'https://polygontestapi.terminet.io/rpc',
-    ],
-    logo: MumbaiIcon,
-    explorer: 'https://mumbai.polygonscan.com',
-    nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
-      decimals: 18,
-    },
-  },
+  // [ChainId.BSC_TEST]: {
+  //   chainId: [ChainId.MUMBAI],
+  //   chainName: 'Mumbai Testnet',
+  //   rpcUrls: [
+  //     'https://matic-testnet-archive-rpc.bwarelabs.com',
+  //     'https://matic-mumbai.chainstacklabs.com',
+  //     'https://rpc.ankr.com/polygon_mumbai',
+  //     'https://polygontestapi.terminet.io/rpc',
+  //   ],
+  //   logo: MumbaiIcon,
+  //   explorer: 'https://mumbai.polygonscan.com',
+  //   nativeCurrency: {
+  //     name: 'MATIC',
+  //     symbol: 'MATIC',
+  //     decimals: 18,
+  //   },
+  // },
 }
 
 export const isChainAllowed = (connector: Connector, chainId?: number) => {

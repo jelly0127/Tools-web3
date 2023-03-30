@@ -1,10 +1,7 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import styled from 'styled-components'
-import LinkBar from '../components/LinkBar'
-import Tab from '../components/Tab/Tab'
 import { PostMethod } from '../../http'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import Create from '../components/createButton/CreateButton'
 import { Timestamp } from '../../helpers/utils'
 
 const Box = styled.div`
@@ -78,8 +75,6 @@ const OpenOrder: React.FC = () => {
   }, [init.timestamp])
   return (
     <Box>
-      <LinkBar />
-      <Create />
       <div className="scroll_box">
         <InfiniteScroll
           next={nextFunc}
@@ -89,7 +84,6 @@ const OpenOrder: React.FC = () => {
           height={450}
           style={{ paddingBottom: '20px' }}
         >
-          <Tab rows={data} TableLoading={TableLoading} />
         </InfiniteScroll>
       </div>
     </Box>
