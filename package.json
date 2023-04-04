@@ -61,7 +61,9 @@
   },
   "scripts": {
     "dev": "craco start",
-    "build": "rimraf ./build && craco build",
+    "clean": "rm -rf build",
+    "build": "yarn clean && craco build",
+    "release": "yarn build && scp -r build  root@47.243.65.167:/root/tool && yarn clean",
     "test": "eslint src --ext .ts,.tsx --quiet",
     "addPage": "node scripts/addPage.js $2",
     "addCompo": "node scripts/addComponent.js $2",

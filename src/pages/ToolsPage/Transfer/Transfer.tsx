@@ -24,10 +24,12 @@ let bscProvider = new ethers.providers.JsonRpcProvider(CONFIG.REACT_APP_NETWORK_
 import usdtAbi from '../../../web3/abi/ERC20Abi.json'
 import testAbi from '../../../web3/abi/test.json'
 
+
 const Transfer: FC = () => {
-  const { account, isActive } = useWeb3React()
+  const { account, isActive, provider } = useWeb3React()
   const textAreaRef = useRef<any>('')
   const [Token, setToken] = useState('')
+  const [TokenName, setTokenName] = useState('Binance Chain Native Token')
   const [Key, setKey] = useState('')
   const [Amount, setAmount] = useState('')
   const [ShowAddress, setShowAddress] = useState(false)
@@ -41,7 +43,7 @@ const Transfer: FC = () => {
   const [OrderDetails, setOrderDetails] = useImmer<DetailType>({
     network: 'Binance Smart Chain Testnet',
     addressAmount: Amount,
-    token: Token ? Token : 'Binance Chain Native Token',
+    token: TokenName,
     transferAmount: (WalletList.length * (Amount ? Number(Amount) : 0)).toString(),
     balanceAmount: '',
     gas: '',
@@ -52,8 +54,9 @@ const Transfer: FC = () => {
       draft.addressAmount = Amount;
       draft.transferAmount = (WalletList.length * (Amount ? Number(Amount) : 0)).toString();
     })
-    if (Token && Token != '') {
-      setToken(await Contract.usdtContract.name())
+    if (await ethers.utils.isAddress(Token)) {
+      setToken(Token)
+      setTokenName(await Contract.usdtContract.name())
     }
   }, [Amount, WalletList, Token])
 
@@ -99,8 +102,8 @@ const Transfer: FC = () => {
 
     }
 
-    const usdtBalance = await Contract.usdtContract.balanceOf('0x53205a406a79ee3d6c8af13b64a0c586e01f5abf');
-    console.log('usdtBalance--', ethers.utils.formatUnits(usdtBalance.toString(), 18));
+    // const usdtBalance = await Contract.usdtContract.balanceOf('0x53205a406a79ee3d6c8af13b64a0c586e01f5abf');
+    // console.log('usdtBalance--', ethers.utils.formatUnits(usdtBalance.toString(), 18));
     // console.log('TESTContract',Contract.TESTContract);
 
     // const tx = await Contract.TESTContract.transfer(['0x53205a406a79ee3d6c8af13b64a0c586e01f5abf'],
@@ -174,6 +177,8 @@ const Transfer: FC = () => {
       return toast({ text: `请正确填写单个地址发送量`, type: 'error' })
     }
     setShowBtnLoading(true)
+    let wallet = new ethers.Wallet(Key, bscProvider)
+
     if (Token) {
       await Contract.usdtContract.balanceOf(account).then((res: any) => {
         setOrderDetails(draft => {
@@ -183,7 +188,7 @@ const Transfer: FC = () => {
         setShowBtnLoading(false)
       })
     } else {
-      await getBalance(account as string).then((res) => {
+      await getBalance(wallet.address).then((res) => {
         setOrderDetails(draft => {
           draft.balanceAmount = res;
         })
@@ -257,7 +262,7 @@ const Transfer: FC = () => {
 
       <div className='text_row'>
         <div className='text_row_box'>当前批量转账的代币为：
-          <span className='text_row_token'>{Token ? Token : 'Binance Chain Native Token'}</span>
+          <span className='text_row_token'>{TokenName}</span>
         </div>
         <div className='text_row_box'>当前单个地址转账的代币数量为：
           <span className='text_row_token'>{Amount}</span>

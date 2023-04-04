@@ -17,6 +17,8 @@ import { Contract } from '../../../web3/contract'
 import ICON_EDIT from '../../../images/edit-icon.svg'
 import Details from './details'
 import { useImmer } from 'use-immer'
+import usdtAbi from '../../../web3/abi/ERC20Abi.json'
+
 type DetailType = {
   network: string
   address: string
@@ -36,9 +38,10 @@ const Collection = () => {
   const [ShowLoading, setShowLoading] = useState(false)
   const [ShowBtnLoading, setShowBtnLoading] = useState(false)
   const [ShowStartLoading, setShowStartLoading] = useState(false)
+  const [TokenName, setTokenName] = useState('Binance Chain Native Token')
 
   const textAreaRef = useRef<any>('')
-  const { account, isActive } = useWeb3React()
+  const { account, isActive, provider } = useWeb3React()
   const [ShowAddress, setShowAddress] = useState(false)
   const [ShowOrder, setShowOrder] = useState(false)
   const [WalletList, setWalletList] = useState<any>([])
@@ -51,18 +54,82 @@ const Collection = () => {
     address: Address,
     addressAmount: WalletList.length,
     Token: Token ? Token : 'Binance Chain Native Token',
-    balanceAmount: '',
+    balanceAmount: '0',
   })
-  useMemo(() => {
+  useMemo(async () => {
     setOrderDetails(draft => {
       draft.address = Address;
       draft.addressAmount = WalletList.length
     })
+    if (await ethers.utils.isAddress(Token)) {
+      setToken(Token)
+      setTokenName(await Contract.usdtContract.name())
+    }
 
-  }, [Address, WalletList])
+  }, [Address, WalletList, Token])
   const handleChainChange = (value: string) => {
     setChainValue(value)
-  };
+  }
+  async function mergeB() {
+    setShowStartLoading(true)
+    let account = Address// 接收地址
+    let num = 0
+    for (let i = 0; i < WalletList.length; i++) {
+      let wallet = new ethers.Wallet(WalletList[i].key, bscProvider)
+      let balance = await bscProvider.getBalance(wallet.address)
+      //主网- 0.000105
+      //测试网 -0.00021
+      if (Number(balance.sub(ethers.utils.parseEther("0.0002"))) <= 0) {
+        continue
+      } else {
+        const tx = await wallet.sendTransaction({
+          to: account,
+          //主网- 0.000105
+          //测试网 -0.00021
+          value: balance.sub(ethers.utils.parseEther((Number('0.002') - CONFIG.GAS_NUMBER).toString())),
+        })
+        await tx.wait().then(res => {
+          num++
+          if (num === WalletList.length) {
+            setShowStartLoading(false)
+            toast({ text: 'Transaction successful', type: 'success' })
+
+          }
+        }).catch((err: any) => {
+          setShowStartLoading(false)
+          return toast({ text: `Transaction failed!`, type: 'error' })
+        })
+      }
+
+    }
+  }
+  //一键归集(u)
+  async function mergeU() {
+    setShowStartLoading(true)
+
+    let account = Address// 接收地址
+    let num = 0
+    for (let i = 0; i < WalletList.length; i++) {
+      let wallet = new ethers.Wallet(WalletList[i].key, bscProvider)
+      let contract = new ethers.Contract(Token, usdtAbi, bscProvider)
+      let ErcSigner = contract.connect(wallet)
+      let amount = await ErcSigner.balanceOf(wallet.address)
+      if (amount == 0) {
+        continue
+      }
+      const tx = await ErcSigner.transfer(account, amount)
+      tx.wait().then((res: any) => {
+        num++
+        if (num === WalletList.length) {
+          setShowStartLoading(false)
+          toast({ text: 'Transaction successful', type: 'success' })
+        }
+      }).catch((err: any) => {
+        setShowStartLoading(false)
+        return toast({ text: `Transaction failed!`, type: 'error' })
+      })
+    }
+  }
   const handleClickStart = async () => {
     if (isActive) {
       if (!IsCheck) {
@@ -72,8 +139,12 @@ const Collection = () => {
       if (!ShowAddress) {
         return toast({ text: `$请先点击查看订单`, type: 'warning' })
       }
+      if (Token) {
+        await mergeU()
+      } else {
+        await mergeB()
 
-
+      }
 
 
     } else {
@@ -125,34 +196,24 @@ const Collection = () => {
     }
     setShowBtnLoading(true)
     if (Token) {
-
       await Contract.usdtContract.balanceOf(account).then((res: any) => {
         setOrderDetails(draft => {
           draft.balanceAmount = ethers.utils.formatUnits(res, 18);
         })
-      }).catch((err: any) => {
+
+      }).finally(() => {
         setShowBtnLoading(false)
       })
     } else {
-      setOrderDetails(draft => {
+      await setOrderDetails(draft => {
         draft.balanceAmount = WalletList.reduce(function (c: any, n: any) {
           return c + Number(n.balance)
         }, 0);
       })
+      setShowBtnLoading(false)
 
     }
-
-
-    // await getGasCost(account as string, WalletList, '1').then((res:any) => { 
-    //    setOrderDetails(draft => {
-    //      draft.gas = res;
-
-    //    })
-    // }).catch(err => { 
-    // setShowBtnLoading(false)
-    // })
     setIsCheck(true)
-    setShowBtnLoading(false)
     setShowOrder(true)
   }
   const topBox = () => {
@@ -212,7 +273,7 @@ const Collection = () => {
 
       <div className='text_row'>
         <div className='text_row_box'>当前批量转账的代币为：
-          <span> Binance Chain Native Token</span>
+          <span>{TokenName}</span>
         </div>
       </div>
 
@@ -258,6 +319,7 @@ const Collection = () => {
             <img src={ICON_PLANE} alt="" />
             开始执行</Button>
         </div>
+
       </div>
     </>
   }

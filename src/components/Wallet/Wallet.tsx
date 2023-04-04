@@ -240,7 +240,7 @@ const Wallet: React.FC = () => {
       {/* <NetworkSelector
         onWalletDisconnect={!isActive && !account ? handleShowDisconnectModal : undefined}
       /> */}
-      {/* <PriceBox>价格</PriceBox> */}
+
       {walletWrapper()}
       <Modal
         title=""
@@ -267,7 +267,7 @@ const Wallet: React.FC = () => {
         </AccountModal>
       </Modal>
       <DisconnectModal />
-      {/* <Modal
+      <Modal
         title="Wrong Network"
         open={switchChainModal}
         width={420}
@@ -292,7 +292,7 @@ const Wallet: React.FC = () => {
             <Button primary onClick={handleConnectNetwork} text="Switch Network" />
           </div>
         </WalletModal>
-      </Modal> */}
+      </Modal>
       {/* <Drawer open={showAccountModal && !isDesktop} onClose={() => setShowAccountModal(false)}>
         <AccountDrawer>
           <div className="content">

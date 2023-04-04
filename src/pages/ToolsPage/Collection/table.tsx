@@ -19,20 +19,20 @@ interface DataType {
   othersBalance?: number;
   balance?: number;
 }
-interface PropsData { 
+interface PropsData {
   data: Array<DataType>
   loading: Boolean,
-  Token:string
+  Token: string
 }
-const column: ColumnsType<DataType>= [
-    {
+const column: ColumnsType<DataType> = [
+  {
     title: '钱包',
     dataIndex: 'wallet',
-  },{
+  }, {
     title: '平台币余额',
     dataIndex: 'balance',
     sorter: {
-      compare: (a:any, b:any) => a.balance - b.balance,
+      compare: (a: any, b: any) => a.balance - b.balance,
       multiple: 3,
     },
   },
@@ -46,11 +46,11 @@ const columns: ColumnsType<DataType> = [
     title: '归集代币余额',
     dataIndex: 'othersBalance',
     sorter: {
-      compare: (a:any, b:any) => a.othersBalance - b.othersBalance,
+      compare: (a: any, b: any) => a.othersBalance - b.othersBalance,
       multiple: 3,
     },
   },
-   {
+  {
     title: '平台币余额',
     dataIndex: 'balance',
     sorter: {
@@ -58,41 +58,40 @@ const columns: ColumnsType<DataType> = [
       multiple: 3,
     },
   }
- 
+
 ];
 
 
 
 
 
-const Tables: React.FC<PropsData> = ({ data,loading ,Token}) =>{
-  const sumDate = (data: Array<DataType>) => { 
+const Tables: React.FC<PropsData> = ({ data, loading, Token }) => {
+  const sumDate = (data: Array<DataType>) => {
     return data.reduce(function (p: number, c: any) {
-    return p + c.balance*1;
-    }, 0) 
+      return p + c.balance * 1;
+    }, 0)
   }
-  const sumDates = (data: Array<DataType>) => { 
+  const sumDates = (data: Array<DataType>) => {
     return data.reduce(function (p: number, c: any) {
-    return p + c.othersBalance*1;
-    }, 0) 
+      return p + c.othersBalance * 1;
+    }, 0)
   }
-  
-console.log('data----',data);
 
-  
+
   return (
     <MyTabs
       loading={loading}
-  pagination={{ position: ['bottomCenter'] }}
-  columns={Token?columns:column} dataSource={data}   summary={() => (
+      pagination={{ position: ['bottomCenter'] }}
+      columns={Token ? columns : column} dataSource={data} summary={() => (
         <Table.Summary fixed>
           <Table.Summary.Row>
-        <Table.Summary.Cell index={0}>Sum</Table.Summary.Cell>
-        { Token?<Table.Summary.Cell index={1}>{ Math.floor(sumDates(data)*100)/100}</Table.Summary.Cell>:null}
-        
-        <Table.Summary.Cell index={2}>{ Math.floor(sumDate(data)*100)/100}</Table.Summary.Cell>
+            <Table.Summary.Cell index={0}>Sum</Table.Summary.Cell>
+            {Token ? <Table.Summary.Cell index={1}>{Math.floor(sumDates(data) * 100) / 100}</Table.Summary.Cell> : null}
+
+            <Table.Summary.Cell index={2}>{Math.floor(sumDate(data) * 100) / 100}</Table.Summary.Cell>
           </Table.Summary.Row>
         </Table.Summary>
-      )} />)}
+      )} />)
+}
 
 export default Tables;

@@ -42,35 +42,35 @@ padding: 20px 10px;
 }
 `
 
-const Details = (props: any) => { 
-  const { network, addressAmount, address,Token,balanceAmount } = props.data
+const Details = (props: any) => {
+  const { network, addressAmount, address, Token, balanceAmount } = props.data
   return (
     <RootBox>
       <div className='top_box'>
-        <div className='top_box_line'/>
+        <div className='top_box_line' />
         订单详情
       </div>
       <div className='bottom_box'>
         <div className='bottom_item_box'>
           <span>当前网络：</span>
-          <span className='bottom_item_box_msg'>{ network}</span>
+          <span className='bottom_item_box_msg'>{network}</span>
         </div>
         <div className='bottom_item_box'>
           <span>当前接收钱包：</span>
-          <span className='bottom_item_box_msg'>{ address}</span>
+          <span className='bottom_item_box_msg'>{address}</span>
         </div>
         <div className='bottom_item_box'>
           <span>当前批量归集的有效地址数量：</span>
-          <span className='bottom_item_box_msg'>{ addressAmount}</span>
+          <span className='bottom_item_box_msg'>{addressAmount}</span>
         </div>
         <div className='bottom_item_box'>
           <span>当前批量归集的代币：</span>
-          <span className='bottom_item_box_msg'>{ Token}</span>
+          <span className='bottom_item_box_msg'>{Token}</span>
         </div>
         <div className='bottom_item_box'>
           <span>当前批量归集的代币总数量：</span>
           <span className='bottom_item_box_msg'> {balanceAmount}</span>
-         
+
         </div>
         {/* <div className='bottom_item_box'>
           <span className='bottom_item_box_gas'>预计消耗GAS(含手续费)
@@ -83,5 +83,5 @@ const Details = (props: any) => {
       </div>
     </RootBox>
   )
- }
+}
 export default Details

@@ -9,3 +9,4 @@ declare global {
     ethereum?: EthereumProvider
   }
 }
+declare module 'window.ethereum'

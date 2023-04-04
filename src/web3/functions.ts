@@ -5,8 +5,14 @@ import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 import { ethers } from 'ethers'
 import { useMemo } from 'react'
-import { contractMethods_Mint, contractMethods_OpSwap,contractMethods_Pancake,contractMethods_Test,contractMethods_Erc20 } from './abi'
 import CONFIG from '../config'
+import {
+  ABI_MAP,
+  contractMethodMap,
+  ContractMethodsMap,
+  contractAddressMap,
+  ContractKey,
+} from './abi'
 export const provider = new ethers.providers.JsonRpcProvider(CONFIG.REACT_APP_NETWORK_URL);
 
 // returns the checksummed address if the address is valid, otherwise returns false
@@ -92,26 +98,36 @@ export async function getGasCost(from: string, to: [any], value: string) {
   }
  
 }
+
+export interface ContractMethodProp {
+  contract: Contract
+  method: string
+  params: any[] | null
+  abiName: keyof ContractMethodsMap
+  isWait?: boolean
+}
 /**
  * 用于构造合约接口的方法
  * @param contract contract instance
  * @param method contract method
  * @param params params
+ * @param abiName
  * @return Promise
  */
-export const contractMethodTest = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_Test.includes(method)) throw Error(`Invalid 'method' ${method} `)
+export const contractMethod = ({
+  contract,
+  method,
+  params,
+  abiName,
+  isWait = false,
+}: ContractMethodProp): Promise<any> => {
+  if (!contractMethodMap[abiName].includes(method)) throw Error(`Invalid 'method' ${method} `)
   return new Promise((resolve, reject) => {
     const contractPromise = params?.length ? contract[method](...params) : contract[method]()
     contractPromise
-      .then((result: any) => {
+      .then(async (result: any) => {
         if (isWait) {
-          result
+          await result
             .wait()
             .then(() => {
               resolve(result)
@@ -124,128 +140,18 @@ export const contractMethodTest = (
       .catch((err: any) => reject(err))
   })
 }
-export const contractMethodErc20 = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_Erc20.includes(method)) throw Error(`Invalid 'method' ${method} `)
-  return new Promise((resolve, reject) => {
-    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
-    contractPromise
-      .then((result: any) => {
-        if (isWait) {
-          result
-            .wait()
-            .then(() => {
-              resolve(result)
-            })
-            .catch((err: any) => reject(err))
-        } else {
-          resolve(result)
-        }
-      })
-      .catch((err: any) => reject(err))
-  })
-}
-export const contractMethodPancake = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_Pancake.includes(method)) throw Error(`Invalid 'method' ${method} `)
-  return new Promise((resolve, reject) => {
-    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
-    contractPromise
-      .then((result: any) => {
-        if (isWait) {
-          result
-            .wait()
-            .then(() => {
-              resolve(result)
-            })
-            .catch((err: any) => reject(err))
-        } else {
-          resolve(result)
-        }
-      })
-      .catch((err: any) => reject(err))
-  })
-}
-
-
-export const contractMethodMint = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_Mint.includes(method)) throw Error(`Invalid 'method' ${method} `)
-  return new Promise((resolve, reject) => {
-    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
-    contractPromise
-      .then((result: any) => {
-        if (isWait) {
-          result
-            .wait()
-            .then(() => {
-              resolve(result)
-            })
-            .catch((err: any) => reject(err))
-        } else {
-          resolve(result)
-        }
-      })
-      .catch((err: any) => reject(err))
-  })
-}
-export const contractMethodOpswap = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_OpSwap.includes(method)) throw Error(`Invalid 'method' ${method} `)
-  return new Promise((resolve, reject) => {
-    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
-    contractPromise
-      .then((result: any) => {
-        if (isWait) {
-          result
-            .wait()
-            .then(() => {
-              resolve(result)
-            })
-            .catch((err: any) => reject(err))
-        } else {
-          resolve(result)
-        }
-      })
-      .catch((err: any) => reject(err))
-  })
-}
-
 // 交易回调
 // 一般是搭配Message 组件来使用
 export const txPromise = (provider: JsonRpcProvider, txHash: string) => {
   return new Promise<void>((resolve, reject) => {
-    provider
-      .getTransaction(txHash)
-      .then(res => {
-        res
-          .wait()
-          .then(txRes => {
-            if (txRes.status === 1) {
-              resolve()
-            } else {
-              reject()
-            }
-          })
-          .catch(() => reject())
-      })
-      .catch(() => reject())
+    provider.getTransaction(txHash).then(res => {
+      res.wait().then(txRes => {
+        if (txRes.status === 1) {
+          resolve()
+        } else {
+          reject()
+        }
+      }).catch(() => reject())
+    }).catch(() => reject())
   })
 }
-

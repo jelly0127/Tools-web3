@@ -1,49 +1,36 @@
 import TestNFT from './abi/TestNFT.json'
-import OpSwap from './abi/OpSwap.json'
-import pancake from './abi/pancakeAbi.json'
-import Test from './abi/test.json'
-import ERC20s from './abi/ERC20Abi.json'
 
+import USDT_ABI from './abi/ERC20Abi.json'
+import PANCAKE_ABI from './abi/pancakeAbi.json'
+import TEST_ABI from './abi/test.json'
+import CONFIG from '../config'
 
-export const TestNFT_ABI = [...TestNFT]
-export const OpSwap_ABI = [...OpSwap]
+export const ABI_MAP = {
+  test: [...TEST_ABI],
+  PANCAKE: [...PANCAKE_ABI],
+  USDT: [...USDT_ABI],
 
-export const Pancake_ABI = [...pancake]
-export const Test_ABI = [...Test]
-export const ERC20_ABI = [...ERC20s]
+}
+const contractMethods = (abi: any[]) => {
+  return abi.reduce((pre, cur) => {
+    if (cur?.name) {
+      pre.push(cur.name)
+    }
+    return pre
+  }, [] as string[])
+}
+// 'testNFT' | 'xxx'
+export type ContractKey = keyof typeof ABI_MAP
+export type ContractMethodsMap = Record<ContractKey, string[]>
 
-export const contractMethods_Pancake = Pancake_ABI.reduce((pre, cur) => {
-  if (cur?.name) {
-    pre.push(cur.name)
-  }
-  return pre
-}, [] as string[])
-export const contractMethods_Test = Test_ABI.reduce((pre, cur) => {
-  if (cur?.name) {
-    pre.push(cur.name)
-  }
-  return pre
-}, [] as string[])
-export const contractMethods_Erc20 = ERC20_ABI.reduce((pre, cur) => {
-  if (cur?.name) {
-    pre.push(cur.name)
-  }
-  return pre
-}, [] as string[])
+export const contractAddressMap: Record<ContractKey, string> = {
+  test: CONFIG.TEST_ADDRESS,
+  PANCAKE: CONFIG.PANCAKE_ADDRESS,
+  USDT: CONFIG.USDT
+}
 
-
-
-export const contractMethods_Mint = TestNFT_ABI.reduce((pre, cur) => {
-  if (cur?.name) {
-    pre.push(cur.name)
-  }
-  return pre
-}, [] as string[])
-export const contractMethods_OpSwap = OpSwap_ABI.reduce((pre, cur) => {
-  if (cur?.name) {
-    pre.push(cur.name)
-  }
-  return pre
-}, [] as string[])
-
-
+export const contractMethodMap: ContractMethodsMap = {
+  test: contractMethods(ABI_MAP.test),
+  PANCAKE: contractMethods(ABI_MAP.PANCAKE),
+  USDT: contractMethods(ABI_MAP.USDT)
+}
