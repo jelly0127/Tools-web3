@@ -1,7 +1,7 @@
 import { getAddress } from 'ethers/lib/utils'
 import VConsole from 'vconsole'
 import moment from 'moment'
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import toast from '../components/Toast/Toast'
 
 export function isAddress(value: any): string | false {
@@ -106,6 +106,16 @@ const BigNumberFrom = (data: number) => {
 export const walletTips = () => {
   toast({ text: 'Please connect the wallet', type: 'warning' })
 }
+// 检测钱包地址是否有效
+function isAddressValid(address:string) {
+  return ethers.utils.isAddress(address);
+}
+const isConnect = (active: boolean) => { 
+  if (!active) { 
+return toast({ text: `请先连接钱包`, type: 'error' })
+  }
+
+}
 export {
   shortenAddress,
   chunk,
@@ -118,4 +128,6 @@ export {
   filterDurationDays,
   BigNumberFromDays,
   BigNumberFrom,
+  isAddressValid,
+  isConnect
 }

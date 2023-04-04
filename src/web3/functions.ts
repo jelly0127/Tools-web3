@@ -3,8 +3,11 @@ import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
+import { ethers } from 'ethers'
 import { useMemo } from 'react'
-import { contractMethods_Mint, contractMethods_OpSwap, contractMethods_Weth } from './abi'
+import { contractMethods_Mint, contractMethods_OpSwap,contractMethods_Pancake,contractMethods_Test,contractMethods_Erc20 } from './abi'
+import CONFIG from '../config'
+export const provider = new ethers.providers.JsonRpcProvider(CONFIG.REACT_APP_NETWORK_URL);
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export const isAddress = (value: any): string | false => {
@@ -67,7 +70,28 @@ export const useContract = <T extends Contract = Contract>(
     }
   }, [addressOrAddressMap, ABI, provider, chainId, withSignerIfPossible, account]) as T
 }
-
+    // 查看钱包余额
+export const getBalance=async(address:string)=> {
+  const balance = await provider.getBalance(address);
+  return ethers.utils.formatEther(balance);
+}
+//转账的 gas 费用
+export async function getGasCost(from: string, to: [any], value: string) {
+  let gas = 0
+  
+  for (let i = 0; i < to.length; i++) {
+    const gasPrice = await provider.getGasPrice();
+  const estimateGas = await provider.estimateGas({
+    from,
+    to:to[i].wallet,
+    value,
+  });
+   return gas+=Number(ethers.utils.formatEther(gasPrice.mul(estimateGas)))
+  //  ethers.utils.formatEther(gasPrice.mul(estimateGas));
+    
+  }
+ 
+}
 /**
  * 用于构造合约接口的方法
  * @param contract contract instance
@@ -75,6 +99,83 @@ export const useContract = <T extends Contract = Contract>(
  * @param params params
  * @return Promise
  */
+export const contractMethodTest = (
+  contract: Contract,
+  method: string,
+  params: any[] | null,
+  isWait?: boolean,
+): Promise<any> => {
+  if (!contractMethods_Test.includes(method)) throw Error(`Invalid 'method' ${method} `)
+  return new Promise((resolve, reject) => {
+    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
+    contractPromise
+      .then((result: any) => {
+        if (isWait) {
+          result
+            .wait()
+            .then(() => {
+              resolve(result)
+            })
+            .catch((err: any) => reject(err))
+        } else {
+          resolve(result)
+        }
+      })
+      .catch((err: any) => reject(err))
+  })
+}
+export const contractMethodErc20 = (
+  contract: Contract,
+  method: string,
+  params: any[] | null,
+  isWait?: boolean,
+): Promise<any> => {
+  if (!contractMethods_Erc20.includes(method)) throw Error(`Invalid 'method' ${method} `)
+  return new Promise((resolve, reject) => {
+    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
+    contractPromise
+      .then((result: any) => {
+        if (isWait) {
+          result
+            .wait()
+            .then(() => {
+              resolve(result)
+            })
+            .catch((err: any) => reject(err))
+        } else {
+          resolve(result)
+        }
+      })
+      .catch((err: any) => reject(err))
+  })
+}
+export const contractMethodPancake = (
+  contract: Contract,
+  method: string,
+  params: any[] | null,
+  isWait?: boolean,
+): Promise<any> => {
+  if (!contractMethods_Pancake.includes(method)) throw Error(`Invalid 'method' ${method} `)
+  return new Promise((resolve, reject) => {
+    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
+    contractPromise
+      .then((result: any) => {
+        if (isWait) {
+          result
+            .wait()
+            .then(() => {
+              resolve(result)
+            })
+            .catch((err: any) => reject(err))
+        } else {
+          resolve(result)
+        }
+      })
+      .catch((err: any) => reject(err))
+  })
+}
+
+
 export const contractMethodMint = (
   contract: Contract,
   method: string,
@@ -125,31 +226,7 @@ export const contractMethodOpswap = (
       .catch((err: any) => reject(err))
   })
 }
-export const contractMethodWeth = (
-  contract: Contract,
-  method: string,
-  params: any[] | null,
-  isWait?: boolean,
-): Promise<any> => {
-  if (!contractMethods_Weth.includes(method)) throw Error(`Invalid 'method' ${method} `)
-  return new Promise((resolve, reject) => {
-    const contractPromise = params?.length ? contract[method](...params) : contract[method]()
-    contractPromise
-      .then((result: any) => {
-        if (isWait) {
-          result
-            .wait()
-            .then(() => {
-              resolve(result)
-            })
-            .catch((err: any) => reject(err))
-        } else {
-          resolve(result)
-        }
-      })
-      .catch((err: any) => reject(err))
-  })
-}
+
 // 交易回调
 // 一般是搭配Message 组件来使用
 export const txPromise = (provider: JsonRpcProvider, txHash: string) => {
@@ -171,3 +248,4 @@ export const txPromise = (provider: JsonRpcProvider, txHash: string) => {
       .catch(() => reject())
   })
 }
+

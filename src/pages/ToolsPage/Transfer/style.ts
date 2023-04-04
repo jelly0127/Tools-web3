@@ -87,6 +87,12 @@ const BackBarBox = styled.div`
     div{
       margin-top: 8px;
     }
+    .text_row_box{
+      flex-direction: row;
+    }
+    .text_row_token{
+      color:#5495DD;
+    }
   }
   .key_row{
     margin-top: 20px;
@@ -95,6 +101,19 @@ const BackBarBox = styled.div`
     flex-direction: row;
     .key_row_red_text{
       flex-direction: row;
+    }
+    .key_row_address_text{
+      flex-direction: row;
+      color: #F95997;
+      img{
+      width: 14px;
+      height: 14px;
+      margin-left: 10px;
+      margin-right: 5px;
+      }
+      :hover{
+        cursor: pointer;
+      }
     }
    }
     
@@ -105,9 +124,14 @@ p{
 .key_row_TextArea{
   max-width: 820px;
   textarea{
+    width: 100%;
     min-height: 280px;
   }
 }
+  }
+  .Detail_box{
+    width: 820px;
+    margin-top: 30px;
   }
   .left{
     margin-left: 10px;

@@ -8,13 +8,15 @@ import { coinbaseWallet, injected, network, walletConnect } from './connectors'
 export enum ChainId {
   MAINNET = 1,
   BSC_TEST = 97,
-  OPTIMISM = 10,
+  BSC=56
+  // OPTIMISM = 10,
   // MUMBAI = 80001,
 }
 
 export const CHAIN_IDS_TO_NAMES = {
-  // [ChainId.MAINNET]: 'mainnet',
+  [ChainId.MAINNET]: 'mainnet',
   [ChainId.BSC_TEST]: 'BSC_Testnet',
+  [ChainId.BSC]: 'BSC',
   // [ChainId.OPTIMISM]: 'optimism',
   // [ChainId.MUMBAI]: 'Mumbai Testnet',
 }
@@ -29,7 +31,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: ChainId[] = Object.values(ChainId).filter(
 export const DEFAULT_NETWORK = ChainId.BSC_TEST
 export const NetworkContextName = 'NETWORK'
 
-export const SUPPORTED_CHAIN_IDS = [80001]
+export const SUPPORTED_CHAIN_IDS = [56,97]
 interface NetworkConfig {
   [key: number]: {
     chainId: typeof SUPPORTED_CHAIN_IDS
@@ -45,18 +47,18 @@ interface NetworkConfig {
   }
 }
 export const NETWORK_CONFIG: NetworkConfig = {
-  // [ChainId.MAINNET]: {
-  //   chainId: [ChainId.MAINNET],
-  //   chainName: 'Ethereum',
-  //   rpcUrls: ['https://eth-mainnet.nodereal.io/v1/1659dfb40aa24bbb8153a677b98064d7'],
-  //   logo: ETHIcon,
-  //   explorer: 'https://etherscan.io/',
-  //   nativeCurrency: {
-  //     name: 'ETH',
-  //     symbol: 'ETH',
-  //     decimals: 18,
-  //   },
-  // },
+  [ChainId.MAINNET]: {
+    chainId: [ChainId.MAINNET],
+    chainName: 'Ethereum',
+    rpcUrls: ['https://eth-mainnet.nodereal.io/v1/1659dfb40aa24bbb8153a677b98064d7'],
+    logo: ETHIcon,
+    explorer: 'https://etherscan.io/',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+  },
   [ChainId.BSC_TEST]: {
     chainId: [ChainId.BSC_TEST],
     chainName: 'BSC_Testnet',
@@ -86,23 +88,20 @@ export const NETWORK_CONFIG: NetworkConfig = {
   //     decimals: 18,
   //   },
   // },
-  // [ChainId.BSC_TEST]: {
-  //   chainId: [ChainId.MUMBAI],
-  //   chainName: 'Mumbai Testnet',
-  //   rpcUrls: [
-  //     'https://matic-testnet-archive-rpc.bwarelabs.com',
-  //     'https://matic-mumbai.chainstacklabs.com',
-  //     'https://rpc.ankr.com/polygon_mumbai',
-  //     'https://polygontestapi.terminet.io/rpc',
-  //   ],
-  //   logo: MumbaiIcon,
-  //   explorer: 'https://mumbai.polygonscan.com',
-  //   nativeCurrency: {
-  //     name: 'MATIC',
-  //     symbol: 'MATIC',
-  //     decimals: 18,
-  //   },
-  // },
+  [ChainId.BSC]: {
+    chainId: [ChainId.BSC],
+    chainName: 'BSC',
+    rpcUrls: [
+      'https://bsc-mainnet.nodereal.io/v1/97638cea1890427aa686bb8035b721b3'
+    ],
+    logo: MumbaiIcon,
+    explorer: 'https://bscscan.com/',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18,
+    },
+  },
 }
 
 export const isChainAllowed = (connector: Connector, chainId?: number) => {

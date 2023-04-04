@@ -10,8 +10,7 @@ import toast from '../../../components/Toast/Toast';
 const bip39 = require('bip39')
 const HDWallet = require('ethereum-hdwallet');
 
-//生成英文助记词
-const mnemonic = bip39.generateMnemonic();
+
 
 type WalletProps = {
   address: string | null
@@ -37,21 +36,24 @@ const CreateWallet: FC = () => {
   const [WalletNum, setWalletNum] = useState(0)
   const [WalletDataList, setWalletDataList] = useState([])
 
+  
+
   const handleCreateWallet = async (num: number) => {
+    //生成英文助记词
+   const mnemonic = bip39.generateMnemonic();
     if (num < 1) return
     let walletObj: Array<WalletProps> | any = []
-    for (var i = 0; i < num; i++) {
+    for (var i = 0; i < num; i++) { 
       const seed = await bip39.mnemonicToSeed(mnemonic); //生成种子
       const hdwallet = HDWallet.fromSeed(seed);
       const key = hdwallet.derive("m/44'/60'/0'/0/" + i); // 地址路径的最后一位设置为循环变量
-      // console.log("PrivateKey = " + key.getPrivateKey().toString('hex')); // 私钥
-      // console.log("PublicKey = " + key.getPublicKey().toString('hex')); // 公钥
       const Private = key.getPrivateKey().toString('hex')
       const EthAddress = key.getAddress().toString('hex'); //地址
       walletObj.push({ 'address': "0x" + EthAddress, 'privateKey': Private, })
     }
 
     setWalletDataList(walletObj)
+
   }
 
   const handleExportBtnClick = () => {
@@ -107,6 +109,8 @@ const CreateWallet: FC = () => {
               生成钱包</Button>
             <Button className='btn_box_right' onClick={handleExportBtnClick}>
               下载表格</Button>
+            {/* <Button className='btn_box_right' onClick={()=>generateWallets(WalletNum)}>
+              test</Button> */}
           </div>
         </div>
       </TopCardBox>

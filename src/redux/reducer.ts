@@ -4,13 +4,11 @@ import { ethers } from 'ethers'
 import { isDesktop } from '../helpers/utils'
 import { DEFAULT_FONT_SIZE } from '../style'
 import { Wallet } from '../web3/connectors'
-import { tabInitData } from '../service'
 
 interface AppState {
   selectedWallet?: Wallet
   isDesktop: boolean
   customProvider?: ethers.providers.JsonRpcProvider
-  detailData: any
   defaultTokenUri: string
   showSwitchChainModal: boolean
 }
@@ -28,7 +26,6 @@ const handleView = (desktopValue: boolean) => {
 const initialState: AppState = {
   selectedWallet: undefined,
   isDesktop,
-  detailData: tabInitData,
   defaultTokenUri:
     'https://ipfs.moralis.io:2053/ipfs/QmQxXbuoBvCCpmm1PgS67HaGkJMSa6aZS7FMSvdadALjHD',
   showSwitchChainModal: false,
@@ -47,9 +44,7 @@ const appSlice = createSlice({
     updateProvider(state, { payload: { provider } }) {
       state.customProvider = provider
     },
-    updateDetail: (state, action) => {
-      state.detailData = action.payload
-    },
+ 
     UpdateDefaultTokenUri: (state, action) => {
       state.defaultTokenUri = action.payload
     },
@@ -63,7 +58,6 @@ export const {
   updateSelectedWallet,
   updateDesktop,
   updateProvider,
-  updateDetail,
   UpdateDefaultTokenUri,
   showSwitchChain,
 } = appSlice.actions
