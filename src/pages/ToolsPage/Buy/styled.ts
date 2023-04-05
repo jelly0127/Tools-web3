@@ -100,6 +100,18 @@ const BackBarBox = styled.div`
     .key_row_red_text{
       flex-direction: row;
     }
+    .key_row_red_img{
+      flex-direction: row;
+        color: #F95997;
+      img{
+        width:14px;
+        height:14px;
+        margin: 0 5px 0 10px;
+      }
+      :hover{
+        cursor: pointer;
+      }
+    }
    }
     
 p{
@@ -109,6 +121,26 @@ p{
 .key_row_TextArea{
   margin-top: 10px;
   max-width: 620px;
+  max-height: 620px;
+  min-height: 100px;
+  overflow-y: scroll;
+}
+.key_row_walletBox{
+  margin-top: 10px;
+  flex-direction: row;
+  max-width: 620px;
+  max-height: 620px;
+  overflow-y: scroll;
+  color: #ababab;
+.key_row_walletBox_address,.key_row_walletBox_value{
+  color: #5495DD;
+}
+.key_row_walletBox_balance{
+  margin-left: 10px;
+}
+.key_row_walletBox_coin{
+  margin-left: 5px;
+}
 }
   }
   .gas_row{

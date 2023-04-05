@@ -19,7 +19,6 @@ interface DataType {
   coin: string;
   balance: number;
   AuthQuantity: number;
-  coinValue: number;
   action: string;
 }
 
@@ -42,11 +41,7 @@ const columns: ColumnsType<DataType> = [
     dataIndex: 'AuthQuantity',
     sorter: (a, b) => a.AuthQuantity - b.AuthQuantity,
   },
-  {
-    title: '账号代币价值',
-    dataIndex: 'coinValue',
-    sorter: (a, b) => a.coinValue - b.coinValue,
-  },
+
   {
     title: '操作',
     dataIndex: 'action',

@@ -145,8 +145,6 @@ const Collection = () => {
         await mergeB()
 
       }
-
-
     } else {
       isConnect(isActive)
     }
