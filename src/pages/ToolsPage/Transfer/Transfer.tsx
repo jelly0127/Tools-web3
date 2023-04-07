@@ -56,7 +56,9 @@ const Transfer: FC = () => {
     })
     if (await ethers.utils.isAddress(Token)) {
       setToken(Token)
-      setTokenName(await Contract.usdtContract.name())
+      const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
+
+      setTokenName(await coinContract.name())
     }
   }, [Amount, WalletList, Token])
 
@@ -69,7 +71,7 @@ const Transfer: FC = () => {
         to: WalletList[i].wallet,
         value: ethers.utils.parseEther(balance.toString()),
       }).then(result => {
-        toast({ text: 'Transaction successful', type: 'success' })
+        toast({ text: 'Transaction successful!', type: 'success' })
 
       }).catch(err => {
         toast({ text: `Transaction failed!`, type: 'error' })
@@ -91,7 +93,7 @@ const Transfer: FC = () => {
         num++
         if (num === WalletList.length) {
           setShowStartLoading(false)
-          toast({ text: 'Transaction successful', type: 'success' })
+          toast({ text: 'Transaction successful!', type: 'success' })
 
         }
 
@@ -101,15 +103,6 @@ const Transfer: FC = () => {
       })
 
     }
-
-    // const usdtBalance = await Contract.usdtContract.balanceOf('0x53205a406a79ee3d6c8af13b64a0c586e01f5abf');
-    // console.log('usdtBalance--', ethers.utils.formatUnits(usdtBalance.toString(), 18));
-    // console.log('TESTContract',Contract.TESTContract);
-
-    // const tx = await Contract.TESTContract.transfer(['0x53205a406a79ee3d6c8af13b64a0c586e01f5abf'],
-    //   '1', CONFIG.USDT)
-    // console.log( '!!!',tx.wait());
-
   }
   const handleClickStart = async (balance: string) => {
     if (isActive) {
@@ -145,6 +138,8 @@ const Transfer: FC = () => {
       const addressList = Array.from(set) as [string]
       const dataArray: any = []
       setInputAddressList(textAreaData)
+      const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
+
       for (const item of addressList) {
         if (await !isAddressValid(item)) {
           toast({ text: `${item} \n is invalid`, type: 'error' })
@@ -153,7 +148,7 @@ const Transfer: FC = () => {
             dataArray.push({
               'key': item, 'wallet': item,
               'balance': Math.floor(Number((await getBalance(item))) * 100) / 100,
-              'othersBalance': Math.floor(Number((ethers.utils.formatUnits(await Contract.usdtContract.balanceOf(item), 18))) * 100) / 100
+              'othersBalance': Math.floor(Number((ethers.utils.formatUnits(await coinContract.balanceOf(item), 18))) * 100) / 100
             })
 
           } else {
@@ -180,7 +175,8 @@ const Transfer: FC = () => {
     let wallet = new ethers.Wallet(Key, bscProvider)
 
     if (Token) {
-      await Contract.usdtContract.balanceOf(account).then((res: any) => {
+      const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
+      await coinContract.balanceOf(account).then((res: any) => {
         setOrderDetails(draft => {
           draft.balanceAmount = ethers.utils.formatUnits(res, 18);
         })

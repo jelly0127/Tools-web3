@@ -15,21 +15,24 @@ th,td{
 `
 interface DataType {
   key: React.Key;
-  address: string;
-  coin: string;
+  wallet: string;
+  coinType: string;
   balance: number;
-  AuthQuantity: number;
-  action: string;
+  approveAmount: number;
+  option: string;
 }
-
+interface PropsData {
+  data: any,
+  loading?: boolean
+}
 const columns: ColumnsType<DataType> = [
   {
     title: '账号',
-    dataIndex: 'address',
+    dataIndex: 'wallet',
   },
   {
     title: '代币名称',
-    dataIndex: 'coin',
+    dataIndex: 'coinType',
   },
   {
     title: '余额',
@@ -38,13 +41,13 @@ const columns: ColumnsType<DataType> = [
   },
   {
     title: '授权数量',
-    dataIndex: 'AuthQuantity',
-    sorter: (a, b) => a.AuthQuantity - b.AuthQuantity,
+    dataIndex: 'approveAmount',
+    sorter: (a, b) => a.approveAmount - b.approveAmount,
   },
 
   {
     title: '操作',
-    dataIndex: 'action',
+    dataIndex: 'option',
   },
 
 ];
@@ -143,12 +146,12 @@ const data = [
   },
 ];
 const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
-  console.log('params', pagination, filters, sorter, extra);
+  // console.log('params', pagination, filters, sorter, extra);
 };
 
-const Tables: React.FC = () =>
+const Tables: React.FC<PropsData> = ({ data, loading = false }) =>
   <MyTabs
     pagination={{ position: ['bottomCenter'] }}
-    columns={columns} dataSource={data} onChange={onChange} />;
+    columns={columns} dataSource={data} onChange={onChange} loading={loading} />;
 
 export default Tables

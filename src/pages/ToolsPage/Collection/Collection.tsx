@@ -39,7 +39,6 @@ const Collection = () => {
   const [ShowBtnLoading, setShowBtnLoading] = useState(false)
   const [ShowStartLoading, setShowStartLoading] = useState(false)
   const [TokenName, setTokenName] = useState('Binance Chain Native Token')
-
   const textAreaRef = useRef<any>('')
   const { account, isActive, provider } = useWeb3React()
   const [ShowAddress, setShowAddress] = useState(false)
@@ -62,8 +61,11 @@ const Collection = () => {
       draft.addressAmount = WalletList.length
     })
     if (await ethers.utils.isAddress(Token)) {
+
       setToken(Token)
-      setTokenName(await Contract.usdtContract.name())
+      const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
+
+      setTokenName(await coinContract.name())
     }
 
   }, [Address, WalletList, Token])
@@ -168,7 +170,7 @@ const Collection = () => {
         } else {
           if (Token) {
             dataArray.push({
-              'key': item, 'wallet': item,
+              'key': item, 'wallet': wallet.address,
               'balance': Math.floor(Number((await getBalance(wallet.address))) * 100) / 100,
               'othersBalance': Math.floor(Number((ethers.utils.formatUnits(await Contract.usdtContract.balanceOf(wallet.address), 18))) * 100) / 100
             })
