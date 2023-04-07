@@ -94,9 +94,7 @@ const Transfer: FC = () => {
         if (num === WalletList.length) {
           setShowStartLoading(false)
           toast({ text: 'Transaction successful!', type: 'success' })
-
         }
-
       }).catch((err: any) => {
         setShowStartLoading(false)
         return toast({ text: `Transaction failed!`, type: 'error' })

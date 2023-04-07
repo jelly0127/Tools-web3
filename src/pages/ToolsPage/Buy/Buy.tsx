@@ -63,10 +63,10 @@ const Buy = () => {
     }
   }
   //合并表单数据
-  const mergeData = () => {
+  const mergeData = async (data: any) => {
     let arr: any = []
-    for (let i = 0; i < WalletList.length; i++) {
-      arr.push(Object.assign({}, WalletList[i], { 'coinType': TokenName, 'approveAmount': Number(BuyAmount), 'option': OPTION, }));
+    for (let i = 0; i < data.length; i++) {
+      arr.push(Object.assign({}, data[i], { 'coinType': TokenName, 'approveAmount': Number(BuyAmount), 'option': OPTION, }));
     }
     return setTableDetails(arr)
   }
@@ -74,13 +74,34 @@ const Buy = () => {
     if (await ethers.utils.isAddress(Token)) {
       const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
       setTokenName(await coinContract.name())
+    } else {
+      setTokenName(ChainValue)
     }
     setIsApprove(false)
   }, [Token, WalletList])
   const handleChainChange = (value: string) => {
     setChainValue(value)
   }
-
+  // 余额
+  const balanceValue = async (textAreaData: any) => {
+    const set = new Set(textAreaData.split("\n").filter((i: string) => { return i }))
+    const addressList = Array.from(set) as [string]
+    const dataArray: any = []
+    for (const item of addressList) {
+      let wallet = new ethers.Wallet(item, bscProvider)
+      const Contracts = new ethers.Contract(Token, usdtAbi, bscProvider)
+      if (await !isAddressValid(wallet.address)) {
+        return toast({ text: `${wallet.address} \n is invalid`, type: 'error' })
+      }
+      dataArray.push({
+        'key': item, 'wallet': wallet.address,
+        'balance': Math.floor(Number(((await ethers.utils.isAddress(Token)) ? (ethers.utils.formatUnits(await Contracts.balanceOf(wallet.address), 18)) : await getBalance(wallet.address))) * 100) / 100,
+      })
+    }
+    setWalletList(dataArray)
+    return dataArray
+  }
+  //点击查看余额
   const handleClickCheck = async () => {
     await setShowAddress(false)
     const textAreaData = textAreaRef?.current?.resizableTextArea?.textArea?.value
@@ -89,34 +110,15 @@ const Buy = () => {
         return toast({ text: `请输入私钥`, type: 'error' })
       }
       setShowLoading(true)
-      const set = new Set(textAreaData.split("\n").filter((i: string) => { return i }))
-      const addressList = Array.from(set) as [string]
-      const dataArray: any = []
       setInputAddressList(textAreaData)
       try {
-        for (const item of addressList) {
-          let wallet = new ethers.Wallet(item, bscProvider)
-          const Contracts = new ethers.Contract(Token, usdtAbi, bscProvider)
-
-          if (await !isAddressValid(wallet.address)) {
-            return toast({ text: `${wallet.address} \n is invalid`, type: 'error' })
-          }
-          dataArray.push({
-            'key': item, 'wallet': wallet.address,
-            'balance': Math.floor(Number(((await ethers.utils.isAddress(Token)) ? (ethers.utils.formatUnits(await Contracts.balanceOf(wallet.address), 18)) : await getBalance(wallet.address))) * 100) / 100,
-          })
-        }
+        await balanceValue(textAreaData)
       } catch (error) {
         console.log(error);
         toast({ text: `${textAreaData} \n is invalid`, type: 'error' })
       }
-
-      console.log('dataArray', dataArray);
-
-      setWalletList(dataArray)
       setShowLoading(false)
       return setShowAddress(true)
-
     } else {
       isConnect(isActive)
     }
@@ -126,6 +128,7 @@ const Buy = () => {
   // useMemo(async () => {
   //   await handleClickCheck()
   // }, [Token])
+  //授权
   const Approve = async (privateKey: string, path: Array<string>, amountIn: string) => {
     let wallet = new ethers.Wallet(privateKey, bscProvider);
     let contract = new ethers.Contract(path[0], usdtAbi, bscProvider)
@@ -135,7 +138,7 @@ const Buy = () => {
 
   }
 
-  // 授权
+  // 点击授权
   const handleApproveClick = (path: string) => {
     if (WalletList.length === 0) {
       return toast({ text: `请输入私钥`, type: 'error' })
@@ -143,7 +146,6 @@ const Buy = () => {
     if (!BuyAmount) {
       return toast({ text: `请输入数量`, type: 'error' })
     }
-
     let num = 0
     setShowApproveLoading(true)
     for (const i of WalletList) {
@@ -153,13 +155,10 @@ const Buy = () => {
         if (num === WalletList.length) {
           setShowApproveLoading(false)
           setIsApprove(true)
-          toast({ text: 'Approve successful', type: 'success' })
-
-
+          toast({ text: 'Approve successful!', type: 'success' })
         }
       }).catch(err => {
         setShowApproveLoading(false)
-
         return toast({ text: `Approve failed! /n ${err}`, type: 'error' })
 
       })
@@ -167,7 +166,7 @@ const Buy = () => {
     }
 
   }
-  // 卖
+  // 买
   const handleBuyClick = (path: string) => {
     if (WalletList.length === 0) {
       return toast({ text: `请输入私钥`, type: 'error' })
@@ -182,14 +181,16 @@ const Buy = () => {
     let num = 0
     setShowBuyLoading(true)
     for (const i of WalletList) {
-      if (ChainValue == 'UDST') {
-        return swapU(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+      if (ChainValue == 'USDT') {
+        return swapU(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BuyUSDT', res);
           if (num === WalletList.length) {
             setShowBuyLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -200,13 +201,15 @@ const Buy = () => {
         })
       }
       if (ChainValue == 'BNB') {
-        return swapB(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapB(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BuyBNB', res);
           if (num === WalletList.length) {
             setShowBuyLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -217,13 +220,15 @@ const Buy = () => {
         })
       }
       if (ChainValue == 'UBSD') {
-        return swapUB(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapUB(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('UBSD', res);
           if (num === WalletList.length) {
             setShowBuyLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -234,13 +239,15 @@ const Buy = () => {
         })
       }
       if (ChainValue == 'BUSD') {
-        return swapBU(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapBU(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BUSD', res);
           if (num === WalletList.length) {
             setShowBuyLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -256,6 +263,8 @@ const Buy = () => {
 
   // usdt 批量买
   async function swapU(privateKey: string, path: Array<string>, amountIn: string) {
+    console.log("privateKey", privateKey, "path", path, "amountIn", amountIn);
+
     let wallet = new ethers.Wallet(privateKey, bscProvider);
     let signer = Contract.pancakeContract.connect(wallet);
     // let contract = new ethers.Contract(path[0], usdtAbi, bscProvider)
@@ -485,7 +494,7 @@ const Buy = () => {
         <BackBar msg={'批量买入'} />
         <CardBox children={topBox()} />
         <div className='tabs_box'>
-          <CardBox children={<Tables data={TableDetails} loading={false} />} />
+          <CardBox children={<Tables data={TableDetails} loading={ShowBuyLoading} />} />
         </div>
       </BackBarBox>
     </RootBox>

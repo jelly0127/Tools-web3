@@ -61,10 +61,8 @@ const Collection = () => {
       draft.addressAmount = WalletList.length
     })
     if (await ethers.utils.isAddress(Token)) {
-
       setToken(Token)
       const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
-
       setTokenName(await coinContract.name())
     }
 

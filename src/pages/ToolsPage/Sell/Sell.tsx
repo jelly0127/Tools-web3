@@ -50,7 +50,7 @@ const Sell = () => {
   const sellPathB = [CONFIG.TOKEN, CONFIG.WETH]
   const sellPathBU = [CONFIG.TOKEN, CONFIG.WETH, Token]
   const sellPathUB = [CONFIG.TOKEN, Token, CONFIG.WETH]
-
+  // 过滤路由
   const filterPath = (path: string) => {
     let nameList = [
       { name: 'BNB', value: sellPathB },
@@ -62,10 +62,11 @@ const Sell = () => {
       if (path == i.name) return i.value
     }
   }
-  const mergeData = () => {
+  //合并表单数据
+  const mergeData = async (data: any) => {
     let arr: any = []
-    for (let i = 0; i < WalletList.length; i++) {
-      arr.push(Object.assign({}, WalletList[i], { 'coinType': TokenName, 'approveAmount': Number(BuyAmount), 'option': OPTION, }));
+    for (let i = 0; i < data.length; i++) {
+      arr.push(Object.assign({}, data[i], { 'coinType': TokenName, 'approveAmount': Number(BuyAmount), 'option': OPTION, }));
     }
     return setTableDetails(arr)
   }
@@ -73,13 +74,34 @@ const Sell = () => {
     if (await ethers.utils.isAddress(Token)) {
       const coinContract = new ethers.Contract(Token, usdtAbi, bscProvider)
       setTokenName(await coinContract.name())
+    } else {
+      setTokenName(ChainValue)
     }
     setIsApprove(false)
   }, [Token, WalletList])
   const handleChainChange = (value: string) => {
     setChainValue(value)
   }
-
+  // 余额
+  const balanceValue = async (textAreaData: any) => {
+    const set = new Set(textAreaData.split("\n").filter((i: string) => { return i }))
+    const addressList = Array.from(set) as [string]
+    const dataArray: any = []
+    for (const item of addressList) {
+      let wallet = new ethers.Wallet(item, bscProvider)
+      const Contracts = new ethers.Contract(Token, usdtAbi, bscProvider)
+      if (await !isAddressValid(wallet.address)) {
+        return toast({ text: `${wallet.address} \n is invalid`, type: 'error' })
+      }
+      dataArray.push({
+        'key': item, 'wallet': wallet.address,
+        'balance': Math.floor(Number(((await ethers.utils.isAddress(Token)) ? (ethers.utils.formatUnits(await Contracts.balanceOf(wallet.address), 18)) : await getBalance(wallet.address))) * 100) / 100,
+      })
+    }
+    setWalletList(dataArray)
+    return dataArray
+  }
+  //点击查看余额
   const handleClickCheck = async () => {
     await setShowAddress(false)
     const textAreaData = textAreaRef?.current?.resizableTextArea?.textArea?.value
@@ -88,34 +110,15 @@ const Sell = () => {
         return toast({ text: `请输入私钥`, type: 'error' })
       }
       setShowLoading(true)
-      const set = new Set(textAreaData.split("\n").filter((i: string) => { return i }))
-      const addressList = Array.from(set) as [string]
-      const dataArray: any = []
       setInputAddressList(textAreaData)
       try {
-        for (const item of addressList) {
-          let wallet = new ethers.Wallet(item, bscProvider)
-          const Contracts = new ethers.Contract(Token, usdtAbi, bscProvider)
-
-          if (await !isAddressValid(wallet.address)) {
-            return toast({ text: `${wallet.address} \n is invalid`, type: 'error' })
-          }
-          dataArray.push({
-            'key': item, 'wallet': wallet.address,
-            'balance': Math.floor(Number(((await ethers.utils.isAddress(Token)) ? (ethers.utils.formatUnits(await Contracts.balanceOf(wallet.address), 18)) : await getBalance(wallet.address))) * 100) / 100,
-          })
-        }
+        await balanceValue(textAreaData)
       } catch (error) {
         console.log(error);
         toast({ text: `${textAreaData} \n is invalid`, type: 'error' })
       }
-
-      console.log('dataArray', dataArray);
-
-      setWalletList(dataArray)
       setShowLoading(false)
       return setShowAddress(true)
-
     } else {
       isConnect(isActive)
     }
@@ -125,6 +128,7 @@ const Sell = () => {
   // useMemo(async () => {
   //   await handleClickCheck()
   // }, [Token])
+  // 授权
   const Approve = async (privateKey: string, path: Array<string>, amountIn: string) => {
     let wallet = new ethers.Wallet(privateKey, bscProvider);
     let contract = new ethers.Contract(path[0], usdtAbi, bscProvider)
@@ -133,7 +137,7 @@ const Sell = () => {
     return await ErcSigner.approve(CONFIG.PANCAKE_ADDRESS, amo)
 
   }
-
+  // 点击授权
   const handleApproveClick = (path: string) => {
     if (WalletList.length === 0) {
       return toast({ text: `请输入私钥`, type: 'error' })
@@ -151,7 +155,7 @@ const Sell = () => {
         if (num === WalletList.length) {
           setShowApproveLoading(false)
           setIsApprove(true)
-          toast({ text: 'Approve successful', type: 'success' })
+          toast({ text: 'Approve successful!', type: 'success' })
         }
       }).catch(err => {
         setShowApproveLoading(false)
@@ -163,6 +167,7 @@ const Sell = () => {
     }
 
   }
+  // 点击卖
   const handleSellClick = (path: string) => {
     if (WalletList.length === 0) {
       return toast({ text: `请输入私钥`, type: 'error' })
@@ -178,13 +183,15 @@ const Sell = () => {
     setShowSellLoading(true)
     for (const i of WalletList) {
       if (ChainValue == 'USDT') {
-        return swapU(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapU(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BuyUSDT', res);
           if (num === WalletList.length) {
             setShowSellLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -195,13 +202,15 @@ const Sell = () => {
         })
       }
       if (ChainValue == 'BNB') {
-        return swapB(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapB(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BuyBNB', res);
           if (num === WalletList.length) {
             setShowSellLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -212,13 +221,15 @@ const Sell = () => {
         })
       }
       if (ChainValue == 'UBSD') {
-        return swapUB(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapUB(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('UBSD', res);
           if (num === WalletList.length) {
             setShowSellLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
 
           }
         }).catch(err => {
@@ -229,13 +240,15 @@ const Sell = () => {
         })
       }
       if (ChainValue == 'BUSD') {
-        return swapBU(i.key, filterPath(path) as string[], BuyAmount).then(res => {
+        return swapBU(i.key, filterPath(path) as string[], BuyAmount).then(async res => {
           num++
           console.log('BUSD', res);
           if (num === WalletList.length) {
             setShowSellLoading(false)
-            toast({ text: 'Transaction successful', type: 'success' })
-            mergeData()
+            toast({ text: 'Transaction successful!', type: 'success' })
+            await balanceValue(InputAddressList).then(async res => {
+              await mergeData(res)
+            })
           }
         }).catch(err => {
           setShowSellLoading(false)
@@ -489,7 +502,7 @@ const Sell = () => {
         <BackBar msg={'批量卖出'} />
         <CardBox children={topBox()} />
         <div className='tabs_box'>
-          <CardBox children={<Tables data={TableDetails} loading={false} />} />
+          <CardBox children={<Tables data={TableDetails} loading={ShowSellLoading} />} />
         </div>
       </BackBarBox>
     </RootBox>
